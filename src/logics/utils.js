@@ -1,8 +1,13 @@
 import _ from 'lodash';
 
-const selectRandomField = (obj) => {
+const selectNodeLabel = (node) => {
+  for (const key in ['Id', 'Name']) {
+    if (key in node.properties)
+      return key;
+  }
+
   let firstKey;
-  for (firstKey in obj) break;
+  for (firstKey in node.properties) break;
   return firstKey;
 };
 
@@ -11,31 +16,44 @@ export const getDiffNodes = (newList, oldList) => {
 };
 
 export const getDiffEdges = (newList, oldList) => {
-  return _.differenceBy(newList, oldList, (edge) => `${edge.from},${edge.to}`);
+  return _.differenceBy(newList, oldList,
+      (edge) => `${ edge.from },${ edge.to }`);
 };
 
-export const extractEdgesAndNodes = (nodeList, nodeLabels=[]) => {
+export const extractEdgesAndNodes = (nodeList, nodeLabels = []) => {
   let edges = [];
   const nodes = [];
 
-  const nodeLabelMap =_.mapValues( _.keyBy(nodeLabels, 'type'), 'field');
+  const nodeLabelMap = _.mapValues(_.keyBy(nodeLabels, 'type'), 'field');
 
   _.forEach(nodeList, (node) => {
     const type = node.label;
     if (!nodeLabelMap[type]) {
-      const field = selectRandomField(node.properties);
+      const field = selectNodeLabel(node);
       const nodeLabel = { type, field };
       nodeLabels.push(nodeLabel);
       nodeLabelMap[type] = field;
     }
     const labelField = nodeLabelMap[type];
-    const label = labelField in node.properties ? node.properties[labelField] : type;
-    nodes.push({ id: node.id, label: String(label), group: node.label, properties: node.properties, type });
+    const label = labelField in node.properties
+        ? node.properties[labelField]
+        : type;
+    nodes.push({
+      id: node.id,
+      label: String(label),
+      group: node.label,
+      properties: node.properties,
+      type,
+    });
 
-    edges = edges.concat(_.map(node.edges, edge => ({ ...edge, type: edge.label, arrows: { to: { enabled: true, scaleFactor: 0.5 } } })));
+    edges = edges.concat(_.map(node.edges, edge => ({
+      ...edge,
+      type: edge.label,
+      arrows: { to: { enabled: true, scaleFactor: 0.5 } },
+    })));
   });
 
-  return { edges, nodes, nodeLabels }
+  return { edges, nodes, nodeLabels };
 };
 
 export const findNodeById = (nodeList, id) => {

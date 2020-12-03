@@ -1,14 +1,14 @@
-import { ACTIONS } from '../constants';
+import {ACTIONS} from '../constants';
 
 const initialState = {
   host: 'localhost',
   port: '8182',
-  query: '',
-  error: null
+  query: 'g.V()',
+  error: null,
 };
 
-export const reducer =  (state=initialState, action)=>{
-  switch (action.type){
+export const reducer = (state = initialState, action) => {
+  switch (action.type) {
     case ACTIONS.SET_HOST: {
       return { ...state, host: action.payload }
     }
