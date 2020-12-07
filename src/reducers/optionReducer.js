@@ -1,9 +1,9 @@
 import _ from 'lodash';
-import { ACTIONS } from '../constants';
+import {ACTIONS} from '../constants';
 
 const initialState = {
   nodeLabels: [],
-  queryHistory: [],
+  queryHistory: ["g.V()"],
   isPhysicsEnabled: true,
   nodeLimit: 100,
   networkOptions: {
@@ -13,7 +13,7 @@ const initialState = {
         centralGravity: 0.005,
         springLength: 230,
         springConstant: 0.18,
-        avoidOverlap: 1.5
+        avoidOverlap: 1.5,
       },
       maxVelocity: 40,
       solver: 'forceAtlas2Based',
@@ -21,37 +21,41 @@ const initialState = {
       stabilization: {
         enabled: true,
         iterations: 50,
-        updateInterval: 25
-      }
+        updateInterval: 25,
+      },
     },
     nodes: {
       shape: "dot",
       size: 20,
       borderWidth: 2,
       font: {
-        size: 11
-      }
+        size: 11,
+      },
     },
     edges: {
       width: 2,
       font: {
-        size: 11
+        size: 11,
       },
       smooth: {
-        type: 'dynamic'
-      }
-    }
-  }
+        type: 'dynamic',
+      },
+    },
+  },
 };
 
-export const reducer =  (state=initialState, action)=>{
-  switch (action.type){
+export const reducer = (state = initialState, action) => {
+  switch (action.type) {
     case ACTIONS.SET_IS_PHYSICS_ENABLED: {
       const isPhysicsEnabled = _.get(action, 'payload', true);
       return { ...state, isPhysicsEnabled };
     }
     case ACTIONS.ADD_QUERY_HISTORY: {
-      return { ...state, queryHistory: [ ...state.queryHistory, action.payload] }
+      const qh = state.queryHistory.filter(
+          item => item !== action.payload);
+      qh.unshift(action.payload);
+      return { ...state, queryHistory: qh }
+      // return { ...state, queryHistory: [ ...state.queryHistory, action.payload] }
     }
     case ACTIONS.CLEAR_QUERY_HISTORY: {
       return { ...state, queryHistory: [] }
@@ -69,7 +73,10 @@ export const reducer =  (state=initialState, action)=>{
       const editedNodeLabel = action.payload.nodeLabel;
 
       if (state.nodeLabels[editIndex]) {
-        const nodeLabels = [...state.nodeLabels.slice(0, editIndex), editedNodeLabel, ...state.nodeLabels.slice(editIndex+1)];
+        const nodeLabels = [
+          ...state.nodeLabels.slice(0, editIndex),
+          editedNodeLabel,
+          ...state.nodeLabels.slice(editIndex + 1)];
         return { ...state, nodeLabels };
       }
       return state;
@@ -77,7 +84,9 @@ export const reducer =  (state=initialState, action)=>{
     case ACTIONS.REMOVE_NODE_LABEL: {
       const removeIndex = action.payload;
       if (removeIndex < state.nodeLabels.length) {
-        const nodeLabels = [...state.nodeLabels.slice(0, removeIndex), ...state.nodeLabels.slice(removeIndex+1)];
+        const nodeLabels = [
+          ...state.nodeLabels.slice(0, removeIndex),
+          ...state.nodeLabels.slice(removeIndex + 1)];
         return { ...state, nodeLabels };
       }
       return state;

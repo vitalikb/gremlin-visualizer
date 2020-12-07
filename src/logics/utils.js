@@ -1,10 +1,10 @@
 import _ from 'lodash';
 
 const selectNodeLabel = (node) => {
-  for (const key in ['Id', 'Name']) {
-    if (key in node.properties)
-      return key;
-  }
+  const keyByPriorirty = ['Id', 'Name'];
+  const found = keyByPriorirty.find(key => { return key in node.properties})
+  if (found)
+    return found;
 
   let firstKey;
   for (firstKey in node.properties) break;
