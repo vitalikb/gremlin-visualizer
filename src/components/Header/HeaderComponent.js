@@ -2,7 +2,7 @@ import React from 'react';
 import {connect} from 'react-redux';
 import {Button, TextField} from '@material-ui/core';
 import axios from 'axios';
-import {ACTIONS, QUERY_ENDPOINT, COMMON_GREMLIN_ERROR} from '../../constants';
+import {ACTIONS, QUERY_ENDPOINT} from '../../constants';
 import {onFetchQuery} from '../../logics/actionHelper';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 
@@ -13,8 +13,6 @@ class Header extends React.Component {
       axios.post(
           QUERY_ENDPOINT,
           {
-            host: this.props.host,
-            port: this.props.port,
             query: dropQuery,
             nodeLimit: this.props.nodeLimit,
           },
@@ -23,7 +21,7 @@ class Header extends React.Component {
         this.props.dispatch({ type: ACTIONS.CLEAR_GRAPH });
       }).catch((error) => {
         this.props.dispatch(
-            { type: ACTIONS.SET_ERROR, payload: COMMON_GREMLIN_ERROR });
+            { type: ACTIONS.SET_ERROR, payload: error });
       });
       this.props.dispatch({ type: ACTIONS.CLEAR_GRAPH });
     }
@@ -31,24 +29,7 @@ class Header extends React.Component {
 
   clearAndSendQuery() {
     this.props.dispatch({ type: ACTIONS.CLEAR_GRAPH });
-    this.props.dispatch({ type: ACTIONS.SET_ERROR, payload: null });
-    axios.post(
-        QUERY_ENDPOINT,
-        {
-          host: this.props.host,
-          port: this.props.port,
-          query: this.props.query,
-          nodeLimit: this.props.nodeLimit,
-        },
-        { headers: { 'Content-Type': 'application/json' } },
-    ).then((response) => {
-      onFetchQuery(response, this.props.query, this.props.nodeLabels,
-          this.props.dispatch);
-    }).catch((error) => {
-      this.props.dispatch(
-          { type: ACTIONS.SET_ERROR, payload: COMMON_GREMLIN_ERROR });
-    });
-
+    this.sendQuery();
   }
 
   clearGraph() {
@@ -61,8 +42,6 @@ class Header extends React.Component {
     axios.post(
         QUERY_ENDPOINT,
         {
-          host: this.props.host,
-          port: this.props.port,
           query: this.props.query,
           nodeLimit: this.props.nodeLimit,
         },
@@ -72,16 +51,8 @@ class Header extends React.Component {
           this.props.dispatch);
     }).catch((error) => {
       this.props.dispatch(
-          { type: ACTIONS.SET_ERROR, payload: COMMON_GREMLIN_ERROR });
+          { type: ACTIONS.SET_ERROR, payload: error });
     });
-  }
-
-  onHostChanged(host) {
-    this.props.dispatch({ type: ACTIONS.SET_HOST, payload: host });
-  }
-
-  onPortChanged(port) {
-    this.props.dispatch({ type: ACTIONS.SET_PORT, payload: port });
   }
 
   onQueryChanged(query) {
@@ -90,7 +61,7 @@ class Header extends React.Component {
 
   onQueryKeyPress(event) {
     if (event.keyCode === 13) {
-      if (event.shiftKey) {
+      if (event.metaKey) {
         this.clearAndSendQuery();
       } else {
         this.sendQuery();
@@ -101,26 +72,16 @@ class Header extends React.Component {
   render() {
     let buttonStyle = { width: '150px', marginLeft: '4px', marginRight: '4px' };
 
-    const filterOptions = (options, { inputValue }) => {return options;}
+    // const filterOptions = (options, { inputValue }) => {return options;}
     // matchSorter(options, inputValue);
 
     return (
         <div className={ 'header' }>
-          <form noValidate autoComplete="off">
-            <TextField value={ this.props.host }
-                       onChange={ (event => this.onHostChanged(
-                           event.target.value)) }
-                       id="standard-basic" label="host"
-                       style={ { width: '200px' } }/>
-            <TextField value={ this.props.port }
-                       onChange={ (event => this.onPortChanged(
-                           event.target.value)) }
-                       id="standard-basic" label="port"
-                       style={ { width: '70px' } }/>
-
+          <form noValidate autoComplete="off" onSubmit={ () => {return false;} }>
             <Autocomplete
                 // filterOptions={ filterOptions }
                 id="combo-box-demo"
+                value={ this.props.query }
                 options={ this.props.queryHistory }
                 getOptionLabel={ (option) => option }
                 style={ { width: "50%", display: 'inline' } }
@@ -129,7 +90,6 @@ class Header extends React.Component {
                 renderInput={ (params) =>
                     <TextField { ...params }
                                value={ this.props.query }
-                               autoFocus
                                onChange={ (event => this.onQueryChanged(
                                    event.target.value)) }
                                onKeyDown={ this.onQueryKeyPress.bind(this) }
@@ -165,8 +125,6 @@ class Header extends React.Component {
 
 export const HeaderComponent = connect((state) => {
   return {
-    host: state.gremlin.host,
-    port: state.gremlin.port,
     query: state.gremlin.query,
     error: state.gremlin.error,
     nodes: state.graph.nodes,

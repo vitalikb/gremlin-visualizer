@@ -1,9 +1,7 @@
 const SERVER_URL = 'http://localhost:3001';
-export const QUERY_ENDPOINT = `${SERVER_URL}/query`;
+export const QUERY_ENDPOINT = `${ SERVER_URL }/query`;
 export const COMMON_GREMLIN_ERROR = 'Invalid query. Please execute a query to get a set of vertices';
 export const ACTIONS = {
-  SET_HOST: 'SET_HOST',
-  SET_PORT: 'SET_PORT',
   SET_QUERY: 'SET_QUERY',
   SET_ERROR: 'SET_ERROR',
   SET_NETWORK: 'SET_NETWORK',
@@ -20,5 +18,5 @@ export const ACTIONS = {
   EDIT_NODE_LABEL: 'EDIT_NODE_LABEL',
   REMOVE_NODE_LABEL: 'REMOVE_NODE_LABEL',
   REFRESH_NODE_LABELS: 'REFRESH_NODE_LABELS',
-  SET_NODE_LIMIT: 'SET_NODE_LIMIT'
+  SET_NODE_LIMIT: 'SET_NODE_LIMIT',
 };

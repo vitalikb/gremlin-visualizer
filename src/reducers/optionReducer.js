@@ -15,7 +15,7 @@ const initialState = {
         springConstant: 0.18,
         avoidOverlap: 1.5,
       },
-      maxVelocity: 40,
+      maxVelocity: 80,
       solver: 'forceAtlas2Based',
       timestep: 0.35,
       stabilization: {
