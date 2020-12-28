@@ -1,12 +1,15 @@
 FROM node:10-alpine
+RUN mkdir gremlin-visualizer-master
+COPY package*.json /gremlin-visualizer-master/
 
 RUN npm cache clean --force && \
-	npm config set strict-ssl false && \
-	apk add wget unzip && \
-	wget --no-check-certificate https://github.com/prabushitha/gremlin-visualizer/archive/master.zip && \
-	unzip master.zip && \
 	cd gremlin-visualizer-master && \
 	npm install
+
+COPY proxy-server.js /gremlin-visualizer-master/
+COPY src /gremlin-visualizer-master/
+COPY public /gremlin-visualizer-master/
+
 
 EXPOSE 3000 3001
 
