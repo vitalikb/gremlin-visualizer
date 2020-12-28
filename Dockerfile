@@ -7,8 +7,8 @@ RUN npm cache clean --force && \
 	npm install
 
 COPY proxy-server.js /gremlin-visualizer-master/
-COPY src /gremlin-visualizer-master/
-COPY public /gremlin-visualizer-master/
+COPY src /gremlin-visualizer-master/src/
+COPY public /gremlin-visualizer-master/public/
 
 
 EXPOSE 3000 3001
