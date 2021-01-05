@@ -56,7 +56,7 @@ function buildClient() {
   const gremlinPort = process.env.GREMLIN_PORT || 8182;
   const protocol = process.env.GREMLIN_PROTOCOL || "ws"
 
-  let url = `${ protocol }://${ gremlinHost }:${ gremlinPort }`;
+  let url = `${ protocol }://${ gremlinHost }:${ gremlinPort }/gremlin`;
   let headers = {};
   if (process.env.AWS_ACCESS_KEY_ID) {
     ({ url, headers } = getUrlAndHeaders(gremlinHost, gremlinPort, {}, '/gremlin', protocol));
