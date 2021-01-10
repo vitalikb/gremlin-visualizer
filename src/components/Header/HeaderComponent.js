@@ -77,7 +77,7 @@ class Header extends React.Component {
 
     return (
         <div className={ 'header' }>
-          <form noValidate autoComplete="off" onSubmit={ () => {return false;} }>
+          <form noValidate autoComplete="off" onSubmit={e => { e.preventDefault(); }}>
             <Autocomplete
                 // filterOptions={ filterOptions }
                 id="combo-box-demo"
